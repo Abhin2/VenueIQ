@@ -54,13 +54,16 @@ function switchTab(t) {
   document.querySelectorAll('.mob-tab').forEach(el => el.classList.remove('active'));
   document.querySelectorAll(`[data-tab="${t}"]`).forEach(el => el.classList.add('active'));
 }
-document.querySelectorAll('[data-tab]').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
-document.querySelectorAll('[data-tab]').forEach(el => el.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();
-    switchTab(el.dataset.tab);
-  }
-}));
+const tabEls = document.querySelectorAll('[data-tab]');
+tabEls.forEach(el => {
+  el.addEventListener('click', () => switchTab(el.dataset.tab));
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      switchTab(el.dataset.tab);
+    }
+  });
+});
 
 /* Modal Authentication System */
 const modal = document.getElementById('apiModal');

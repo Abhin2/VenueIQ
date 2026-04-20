@@ -5,6 +5,9 @@ const express = require('express');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const MAX_MESSAGE_LENGTH = 5000;
+const MAX_PROMPT_LENGTH = 4000;
+const MAX_CONTEXT_LENGTH = 4000;
 
 app.use(express.json({ limit: '1mb' }));
 
@@ -18,9 +21,9 @@ app.get('/utils.js', (_req, res) => sendRootFile(res, 'utils.js'));
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const message = String(req.body?.message || '').trim().slice(0, 5000);
-    const prompt = String(req.body?.prompt || '').slice(0, 4000);
-    const context = String(req.body?.context || '').slice(0, 4000);
+    const message = String(req.body?.message || '').trim().slice(0, MAX_MESSAGE_LENGTH);
+    const prompt = String(req.body?.prompt || '').slice(0, MAX_PROMPT_LENGTH);
+    const context = String(req.body?.context || '').slice(0, MAX_CONTEXT_LENGTH);
 
     if (!message) {
       return res.status(400).json({ error: 'message is required' });

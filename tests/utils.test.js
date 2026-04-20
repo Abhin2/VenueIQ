@@ -5,6 +5,7 @@ describe('utils', () => {
     expect(clamp(5, 1, 10)).toBe(5);
     expect(clamp(-1, 1, 10)).toBe(1);
     expect(clamp(20, 1, 10)).toBe(10);
+    expect(clamp(Number.NaN, 1, 10)).toBe(1);
   });
 
   test('randomIntInRange always returns in range', () => {
