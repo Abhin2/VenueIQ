@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>VenueIQ — Agentic AI Platform</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  
+  <!-- EXTERNAL CSS -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- EXTERNAL JS -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <!-- BOOT SEQUENCE -->
+  <div id="bootScreen">
+    <div class="boot-logo"><div class="icon"></div> VENUEIQ OS</div>
+    <div class="boot-bar-wrap"><div class="boot-bar"></div></div>
+  </div>
+
+  <div class="hologram-bg"></div>
+  <div id="toastWrap"></div>
+
+  <!-- HEADER -->
+  <header class="founderz-header">
+    <div class="fh-left">
+      <div class="fh-nav active" data-tab="overview">Overview</div>
+      <div class="fh-nav" data-tab="chat">Neu-Chat</div>
+      <div class="fh-nav" data-tab="map">Spatial</div>
+    </div>
+    <div class="fh-center display-font"><div class="icon"></div>VENUEIQ</div>
+    <div class="fh-right">
+      <div class="fh-nav" data-tab="staff" style="margin-right:8px;">Ops</div>
+      <div class="fh-nav" data-tab="lab" style="margin-right:16px;">Agent Code</div>
+      <div class="fh-game-meta">Q3 <span id="clockHead" class="fh-meta-clock">LIVE</span></div>
+      <button class="fh-btn-outline" id="skipHeaderBtn">Demo Mode</button>
+      <button class="fh-btn-solid" id="connectHeaderBtn">Init Core</button>
+    </div>
+  </header>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="apiModal" class="hidden">
+    <div class="modal-content">
+      <div class="modal-title display-font">Authenticate</div>
+      <div class="modal-desc">Connect Gemini 2.0 to activate Agentic System.</div>
+      <div id="apiError" style="color:var(--red); font-size:0.85rem; margin-bottom:16px; display:none;">Error: Invalid Auth Token</div>
+      <input type="password" id="apiKeyInput" class="modal-input" placeholder="Enter API Key" autocomplete="off">
+      <button id="connectBtn" class="modal-btn">Initialize Connection</button>
+      <button id="skipBtn" class="modal-btn-skip">Skip & Run Demo Data</button>
+    </div>
+  </div>
+
+  <!-- MAIN APP WRAPPER -->
+  <div class="app-layout">
+    <div class="main-wrapper">
+      <main class="main-content" id="mainContent">
+        
+        <!-- OVERVIEW TAB -->
+        <section class="tab-pane active" id="pane-overview">
+          <div class="stats-grid">
+            <div class="stat-card stat-c-cyan"><div class="stat-label">Total Attendees</div><div class="stat-value display-font" id="sAtt">18,247</div><div class="stat-trend">▲ 2.4%</div></div>
+            <div class="stat-card stat-c-green"><div class="stat-label">Safety Metric</div><div class="stat-value display-font" id="sSat">94%</div><div class="stat-trend">▲ +3 pts</div></div>
+            <div class="stat-card stat-c-amber"><div class="stat-label">Wait Reduction</div><div class="stat-value display-font" id="sWai">38%</div><div class="stat-trend">Optimized</div></div>
+            <div class="stat-card stat-c-purple"><div class="stat-label">Anomalies</div><div class="stat-value display-font" id="sInc">7</div><div class="stat-trend">Resolved</div></div>
+          </div>
+
+          <div class="ticker-wrap">
+            <div class="ticker-scroll">
+              <span><i>✅</i> AGENTS ONLINE AND SECURE</span><span><i>✅</i> LOT D CLEARED</span><span><i>⚠️</i> GATE A ELEVATED LOAD</span>
+              <span><i>🍔</i> FOOD NODE 3M WAIT</span><span><i>🚻</i> SECTOR 101 ONLINE</span><span><i>✅</i> AGENTS ONLINE AND SECURE</span>
+              <span><i>✅</i> LOT D CLEARED</span><span><i>⚠️</i> GATE A ELEVATED LOAD</span><span><i>🍔</i> FOOD NODE 3M WAIT</span>
+            </div>
+          </div>
+
+          <!-- LINE CHART -->
+          <div class="card-box" style="padding-bottom: 24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+               <div class="section-title" style="margin:0;">24H CROWD DENSITY TREND</div>
+               <button class="fh-btn-outline" style="font-size:0.7rem; padding: 6px 14px;" onclick="fireAgentAction('REPORT')">↓ EXPORT PDF</button>
+            </div>
+            <div class="chart-container-wrap">
+              <canvas id="trendChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="section-title">PERIMETER TRAFFIC SENSORS</div>
+            <div id="gatesList"></div>
+          </div>
+        </section>
+
+        <!-- CHAT TAB -->
+        <section class="tab-pane" id="pane-chat">
+          <div class="chat-wrapper">
+            <div class="chat-history" id="chatArea">
+              <div class="bubble ai" style="opacity:1;">
+                <div class="ai-header">
+                  <div class="ai-name"><div class="icon"></div> VIQ AGENT</div>
+                  <div class="ai-tag">STANDBY</div>
+                </div>
+                <div class="ai-text">System operational. I have full read/write access to the SaaS UI. Ask me to <strong>"initiate a lockdown"</strong> or <strong>"dispatch an agent to Gate A"</strong>.</div>
+              </div>
+            </div>
+            <div class="chat-input-area">
+              <div class="quick-pills" id="pillsWrap">
+                <button class="pill-btn">Deploy staff to Gate A</button>
+                <button class="pill-btn" style="color:var(--red); border-color:var(--red);">Initiate emergency lockdown</button>
+                <button class="pill-btn">Locate Restroom</button>
+                <button class="pill-btn">Export daily report</button>
+              </div>
+              <div class="input-box">
+                <input type="text" id="chatInp" class="input-field" placeholder="Command Agentic UI..." autocomplete="off">
+                <button id="sendBtn" class="send-action">↑</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- MAP TAB -->
+        <section class="tab-pane" id="pane-map">
+          <div class="card-box">
+            <div class="section-title">SPATIAL HEAT DENSITY</div>
+            <div class="heatmap-grid" id="hmGrid"></div>
+          </div>
+          <div class="section-title" style="margin-left:4px;">SANITATION SUBSYSTEMS</div>
+          <div class="restroom-grid" id="rrGrid"></div>
+        </section>
+
+        <!-- OPS TAB -->
+        <section class="tab-pane" id="pane-staff">
+          <div class="card-box">
+            <div class="section-title">PRECOGNITIVE ANALYSIS</div>
+            <button class="action-btn" id="genPredsBtn">RUN ML PREDICTION <span style="font-weight:900;">→</span></button>
+            <div id="predsList"></div>
+          </div>
+          <div class="card-box">
+            <div class="section-title">SYSTEM DIAGNOSTICS</div>
+            <div class="stats-grid" style="grid-template-columns: 1fr 1fr; margin:0; gap:20px;" id="kpiList"></div>
+          </div>
+        </section>
+
+        <!-- PROMPT LAB TAB -->
+        <section class="tab-pane" id="pane-lab">
+          <div class="terminal-card">
+            <div class="terminal-header">
+              <div class="section-title" style="margin:0;color:var(--text);">SECURE AGENT DIRECTIVE (READ-ONLY)</div>
+              <div class="term-badge" id="tokCount">INIT_STATE</div>
+            </div>
+            <textarea class="term-area" id="sysPromptArea" spellcheck="false" readonly></textarea>
+          </div>
+          <div class="terminal-card">
+            <div class="section-title" style="color:var(--primary);">LIVE TELEMETRY STREAM</div>
+            <div class="term-preview" id="ctxPreview"></div>
+          </div>
+          <div class="terminal-card" style="background:#fff;">
+            <div class="section-title" style="color:var(--text);">MANUAL FUNCTION OVERRIDE</div>
+            <button class="action-btn" onclick="fireAgentAction('DISPATCH')">SIMULATE: DISPATCH UI</button>
+            <button class="action-btn" style="background:var(--red);margin:0;" onclick="fireAgentAction('LOCKDOWN')">SIMULATE: LOCKDOWN UI</button>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- RIGHT PANEL ALERTS -->
+      <aside class="right-panel">
+        <div class="panel-section" style="padding-bottom:12px;">
+          <div class="section-title">REAL-TIME ANOMALIES</div>
+          <div class="alerts-list" id="rAlerts"></div>
+        </div>
+        <div class="panel-section">
+          <div class="section-title">AGENT QUICK-LINK</div>
+          <div class="quick-chat-history" id="qcHistory">
+            <div class="qc-bubble qc-ai">Subsystems active.</div>
+          </div>
+          <div class="qc-input-wrap">
+            <input type="text" class="qc-input" id="qcInp" placeholder="Ping Agent..." autocomplete="off">
+            <button class="qc-send" id="qcBtn">↑</button>
+          </div>
+          <div class="qc-brand" style="margin-top:16px;">Agentic UI Powered by Gemini</div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- MOBILE NAVIGATION -->
+    <nav class="mobile-tab-bar">
+      <div class="mob-tab active" data-tab="overview">Home</div>
+      <div class="mob-tab" data-tab="chat">Agent</div>
+      <div class="mob-tab" data-tab="map">Map</div>
+      <div class="mob-tab" data-tab="staff">Ops</div>
+      <div class="mob-tab" data-tab="lab">Code</div>
+    </nav>
+  </div>
+
+</body>
+</html>
