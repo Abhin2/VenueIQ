@@ -10,15 +10,33 @@
 
 ## 🛠️ Technical Stack
 * **Frontend:** Vanilla HTML5, CSS3, JavaScript (No heavy frameworks for speed)
+* **Backend:** Node.js + Express
 * **Data Vis:** Chart.js (CDN)
 * **AI Engine:** Google Gemini Flash (REST API Integration)
-* **Security:** Client-side Key Validation via LocalStorage
+* **Security:** Server-side Gemini API calls with environment-based secret management
+* **Testing:** Jest unit tests for core utility logic
 
 ## 💡 How to Run Locally
 1. Clone this repository.
-2. Open `index.html` in your browser.
-3. Authenticate with your Google Gemini API key or type `hackathon` for the developer bypass.
-4. Go to the **Neu-Chat** tab to interact with the Agentic AI.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Add your Gemini key in `.env`:
+   ```bash
+   GEMINI_API_KEY=your_google_gemini_api_key
+   ```
+4. Start the backend:
+   ```bash
+   node server.js
+   ```
+5. Open `http://localhost:3000`.
+6. Authenticate from the modal (or type `hackathon` for developer bypass), then use **Neu-Chat**.
+
+## ✅ Run Tests
+```bash
+npm test
+```
 
 ---
 *Built for the Google AI Hackathon.*

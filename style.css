@@ -192,6 +192,17 @@ button:active { transform: scale(0.95); }
 .modal-btn { width: 100%; background: var(--primary); color: #fff; font-weight: 700; padding: 16px; border-radius: 999px; margin-bottom: 16px; font-size: 1rem; cursor: pointer; border: none; }
 .modal-btn-skip { width: 100%; background: transparent; color: var(--text-2); font-weight: 600; border: none; font-size: 0.9rem; cursor: pointer; }
 .hidden { display: none !important; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* RESPONSIVE */
 @media (max-width: 1023px) {
