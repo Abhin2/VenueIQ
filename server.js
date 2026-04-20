@@ -5,6 +5,7 @@ const express = require('express');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
 const MAX_MESSAGE_LENGTH = 5000;
 const MAX_PROMPT_LENGTH = 4000;
 const MAX_CONTEXT_LENGTH = 4000;
@@ -63,15 +64,13 @@ app.post('/api/chat', async (req, res) => {
     console.error('Error handling /api/chat:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-  if (require.main === module) {
+});
+
+// Only listen when running directly (not when imported by Jest tests)
+if (require.main === module) {
   app.listen(port, () => {
     console.log(`VenueIQ backend running on http://localhost:${port}`);
   });
 }
 
 module.exports = app;
-});
-
-app.listen(port, () => {
-  console.log(`VenueIQ backend running on http://localhost:${port}`);
-});
