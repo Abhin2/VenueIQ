@@ -11,7 +11,30 @@
     return Math.floor(Math.random() * (high - low + 1)) + low;
   }
 
-  const utils = { clamp, randomIntInRange };
+  // Extracts hidden action tags from LLM output and returns clean text + actions list
+  // Supported tags: [ACTION: DISPATCH] [ACTION: LOCKDOWN] [ACTION: REPORT]
+  function parseAgentActions(inputText) {
+    const text = String(inputText || '');
+    const actions = [];
+
+    const tags = [
+      { tag: '[ACTION: DISPATCH]', action: 'DISPATCH' },
+      { tag: '[ACTION: LOCKDOWN]', action: 'LOCKDOWN' },
+      { tag: '[ACTION: REPORT]', action: 'REPORT' }
+    ];
+
+    let clean = text;
+    for (const t of tags) {
+      if (clean.includes(t.tag)) {
+        actions.push(t.action);
+        clean = clean.split(t.tag).join('');
+      }
+    }
+
+    return { cleanText: clean.trim(), actions };
+  }
+
+  const utils = { clamp, randomIntInRange, parseAgentActions };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = utils;
