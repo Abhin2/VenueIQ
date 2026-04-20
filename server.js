@@ -63,6 +63,13 @@ app.post('/api/chat', async (req, res) => {
     console.error('Error handling /api/chat:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
+  if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`VenueIQ backend running on http://localhost:${port}`);
+  });
+}
+
+module.exports = app;
 });
 
 app.listen(port, () => {
