@@ -11,8 +11,13 @@
     return Math.floor(Math.random() * (high - low + 1)) + low;
   }
 
-  // Extracts hidden action tags from LLM output and returns clean text + actions list
-  // Supported tags: [ACTION: DISPATCH] [ACTION: LOCKDOWN] [ACTION: REPORT]
+  /**
+   * Extract agent action tags from model output.
+   * Supported tags:
+   *  - [ACTION: DISPATCH]
+   *  - [ACTION: LOCKDOWN]
+   *  - [ACTION: REPORT]
+   */
   function parseAgentActions(inputText) {
     const text = String(inputText || '');
     const actions = [];
@@ -36,9 +41,12 @@
 
   const utils = { clamp, randomIntInRange, parseAgentActions };
 
+  // Node / Jest
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = utils;
   }
+
+  // Browser
   if (globalScope) {
     globalScope.VenueIQUtils = utils;
   }
