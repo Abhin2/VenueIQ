@@ -357,10 +357,12 @@ async function handleChat(inpEl, outEl) {
     try {
       const resp = await callGen(t, sysPrompt); const id = Date.now();
       
-      let cleanText = resp;
-      if(cleanText.includes('[ACTION: DISPATCH]')) { cleanText = cleanText.replace('[ACTION: DISPATCH]',''); fireAgentAction('DISPATCH'); }
-      if(cleanText.includes('[ACTION: LOCKDOWN]')) { cleanText = cleanText.replace('[ACTION: LOCKDOWN]',''); fireAgentAction('LOCKDOWN'); }
-      if(cleanText.includes('[ACTION: REPORT]')) { cleanText = cleanText.replace('[ACTION: REPORT]',''); fireAgentAction('REPORT'); }
+     const parsed = utils.parseAgentActions ? utils.parseAgentActions(resp) : { cleanText: resp, actions: [] };
+      
+      let cleanText = parsed.cleanText;
+      if (parsed.actions.includes('DISPATCH')) fireAgentAction('DISPATCH');
+      if (parsed.actions.includes('LOCKDOWN')) fireAgentAction('LOCKDOWN');
+      if (parsed.actions.includes('REPORT')) fireAgentAction('REPORT');
       
       outEl.insertAdjacentHTML('beforeend', `<div class="bubble ai" id="m${id}" style="opacity:1;"><div class="ai-header"><div class="ai-name"><div class="icon"></div> VIQ AGENT</div><div class="ai-tag" style="background:var(--primary);color:#fff;">${tag}</div></div><div class="ai-text"><span class="streaming-cursor"></span></div></div>`);
       const el = document.getElementById(`m${id}`).querySelector('.ai-text'); let cur = '';
