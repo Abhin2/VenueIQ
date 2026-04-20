@@ -98,8 +98,16 @@ document.getElementById('connectBtn').onclick = async () => {
       isDemoBypass = false;
       dismissModal();
       markConnected();
-    } else throw new Error();
-  } catch(e) { errEl.style.display='block'; }
+    } else {
+      const info = await res.json().catch(() => ({}));
+      errEl.textContent = `Error: ${info.error || 'Unable to connect backend'}`;
+      throw new Error();
+    }
+  } catch(e) {
+    if (!errEl.textContent.trim()) errEl.textContent = 'Error: Unable to connect backend';
+    errEl.style.display='block';
+    console.error('Connection validation failed:', e);
+  }
   btn.textContent = 'Initialize Connection'; btn.disabled=false;
 };
 
