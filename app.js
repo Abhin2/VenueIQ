@@ -1,6 +1,9 @@
-let API_KEY = ''; 
 let isGemini = false; 
 let isSending = false;
+let isDemoBypass = false;
+const utils = window.VenueIQUtils || {};
+const clamp = utils.clamp || ((v, min, max) => Math.max(min, Math.min(max, v)));
+const randomIntInRange = utils.randomIntInRange || ((min, max) => Math.floor(Math.random() * (max - min + 1)) + min);
 
 /* Boot Sequence */
 setTimeout(() => {
@@ -8,18 +11,20 @@ setTimeout(() => {
   setTimeout(()=> document.getElementById('bootScreen').style.display = 'none', 600);
 }, 1600);
 
-/* LOCAL STORAGE */
+/* Connection State */
+function markConnected() {
+  const hcBtn = document.getElementById('connectHeaderBtn');
+  hcBtn.textContent = 'LINKED';
+  hcBtn.classList.add('connected');
+  document.querySelectorAll('.ai-tag').forEach(e => {
+    e.textContent='GEMINI 2.0';
+    e.style.color='#fff';
+    e.style.background='var(--primary)';
+  });
+}
+
 window.onload = () => {
-  const savedKey = localStorage.getItem('viq_api_key');
-  if(savedKey) {
-    API_KEY = savedKey; isGemini = true;
-    document.getElementById('apiModal').classList.add('hidden');
-    const hcBtn = document.getElementById('connectHeaderBtn');
-    hcBtn.textContent = 'LINKED'; hcBtn.classList.add('connected');
-    document.querySelectorAll('.ai-tag').forEach(e => { e.textContent='GEMINI 2.0'; e.style.color='#fff'; e.style.background='var(--primary)'; });
-  } else {
-    document.getElementById('apiModal').classList.remove('hidden');
-  }
+  document.getElementById('apiModal').classList.remove('hidden');
 };
 
 /* Action Toasts */
@@ -50,6 +55,12 @@ function switchTab(t) {
   document.querySelectorAll(`[data-tab="${t}"]`).forEach(el => el.classList.add('active'));
 }
 document.querySelectorAll('[data-tab]').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
+document.querySelectorAll('[data-tab]').forEach(el => el.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    switchTab(el.dataset.tab);
+  }
+}));
 
 /* Modal Authentication System */
 const modal = document.getElementById('apiModal');
@@ -60,37 +71,35 @@ document.getElementById('skipHeaderBtn').onclick = openModal;
 document.getElementById('connectHeaderBtn').onclick = openModal;
 
 document.getElementById('connectBtn').onclick = async () => {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if(!key) { document.getElementById('apiError').style.display='block'; return;}
+  const key = document.getElementById('apiKeyInput').value.trim().toLowerCase();
+  const errEl = document.getElementById('apiError');
+  errEl.style.display = 'none';
   const btn = document.getElementById('connectBtn');
   btn.textContent = 'VALIDATING LINK...'; btn.disabled=true;
   
   // HACKATHON DEMO BYPASS
   if (key === "hackathon") {
-    API_KEY = key; isGemini = true; 
-    localStorage.setItem('viq_api_key', key);
+    isGemini = true;
+    isDemoBypass = true;
     dismissModal();
-    const hcBtn = document.getElementById('connectHeaderBtn');
-    hcBtn.textContent = 'LINKED'; hcBtn.classList.add('connected');
-    document.querySelectorAll('.ai-tag').forEach(e => { e.textContent='GEMINI 2.0'; e.style.color='#fff'; e.style.background='var(--primary)'; });
+    markConnected();
     btn.textContent = 'Initialize Connection'; btn.disabled=false;
     return;
   }
 
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:'hi'}]}]})
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ message: 'ping', prompt: 'Respond with pong.', context: '' })
     });
     if(res.ok) {
-      API_KEY = key; isGemini = true; 
-      localStorage.setItem('viq_api_key', key);
+      isGemini = true;
+      isDemoBypass = false;
       dismissModal();
-      const hcBtn = document.getElementById('connectHeaderBtn');
-      hcBtn.textContent = 'LINKED'; hcBtn.classList.add('connected');
-      document.querySelectorAll('.ai-tag').forEach(e => { e.textContent='GEMINI 2.0'; e.style.color='#fff'; e.style.background='var(--primary)'; });
+      markConnected();
     } else throw new Error();
-  } catch(e) { document.getElementById('apiError').style.display='block'; }
+  } catch(e) { errEl.style.display='block'; }
   btn.textContent = 'Initialize Connection'; btn.disabled=false;
 };
 
@@ -123,54 +132,145 @@ const myChart = new Chart(ctxC, {
 });
 setInterval(() => {
   if(Math.random()>0.5){
-    let d = myChart.data.datasets[0].data; d[6] = Math.max(60, Math.min(95, d[6]+(Math.floor(Math.random()*5)-2)));
-    let d2 = myChart.data.datasets[1].data; d2[6] = Math.max(20, Math.min(50, d2[6]+(Math.floor(Math.random()*5)-2)));
+    let d = myChart.data.datasets[0].data; d[6] = clamp(d[6] + randomIntInRange(-2, 2), 60, 95);
+    let d2 = myChart.data.datasets[1].data; d2[6] = clamp(d2[6] + randomIntInRange(-2, 2), 20, 50);
     myChart.update();
   }
 }, 5000);
 
 /* Core IoT Telemetry Simulator */
-const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
-const randStr = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
-
 let att=18247, sat=94, wr=38, inc=7;
 setInterval(()=>{
-  att=clamp(att+randStr(-30,60),16000,20000); sat=clamp(sat+randStr(-1,1),88,99);
+  att=clamp(att+randomIntInRange(-30,60),16000,20000); sat=clamp(sat+randomIntInRange(-1,1),88,99);
   document.getElementById('sAtt').textContent=att.toLocaleString();
   document.getElementById('sSat').textContent=sat+'%';
 }, 4000);
 
 const gates = [{n:'NORTH PERIMETER', p:62}, {n:'EAST PERIMETER', p:45}, {n:'SOUTH PERIMETER', p:81}, {n:'WEST PERIMETER', p:28}];
-function rGates(){
+const gateRefs = [];
+function initGates(){
   const gatesEl = document.getElementById('gatesList');
   if(!gatesEl) return;
-  gatesEl.innerHTML = gates.map(g => {
-    return `<div class="gate-row">
-      <div class="gate-info"><div class="gate-name">${g.n}</div></div>
-      <div class="gate-bar-container"><div class="gate-bar-bg"><div class="gate-bar-fill" style="width:${g.p}%"></div></div></div>
-      <div class="gate-pct display-font">${g.p}%</div>
-    </div>`;
-  }).join('');
+  gatesEl.textContent = '';
+  gates.forEach(g => {
+    const row = document.createElement('div');
+    row.className = 'gate-row';
+
+    const info = document.createElement('div');
+    info.className = 'gate-info';
+    const name = document.createElement('div');
+    name.className = 'gate-name';
+    name.textContent = g.n;
+    info.appendChild(name);
+
+    const barContainer = document.createElement('div');
+    barContainer.className = 'gate-bar-container';
+    const barBg = document.createElement('div');
+    barBg.className = 'gate-bar-bg';
+    const fill = document.createElement('div');
+    fill.className = 'gate-bar-fill';
+    barBg.appendChild(fill);
+    barContainer.appendChild(barBg);
+
+    const pct = document.createElement('div');
+    pct.className = 'gate-pct display-font';
+
+    row.appendChild(info);
+    row.appendChild(barContainer);
+    row.appendChild(pct);
+    gatesEl.appendChild(row);
+    gateRefs.push({ fill, pct });
+  });
 }
-rGates(); setInterval(()=>{ gates.forEach(g=>g.p=clamp(g.p+randStr(-5,5),10,98)); rGates();}, 3000);
+function updateGates() {
+  gates.forEach((g, i) => {
+    gateRefs[i].fill.style.width = `${g.p}%`;
+    gateRefs[i].pct.textContent = `${g.p}%`;
+  });
+}
+initGates();
+updateGates();
+setInterval(()=>{ gates.forEach(g=>g.p=clamp(g.p+randomIntInRange(-5,5),10,98)); updateGates();}, 3000);
 
 const zones = [{n:'SEC 1',p:45},{n:'SEC 2',p:72},{n:'SEC 3',p:38},{n:'SEC 4',p:58},{n:'CORE',p:85},{n:'SEC 5',p:41},{n:'SEC 6',p:33},{n:'SEC 7',p:77},{n:'SEC 8',p:26}];
-function rZones(){
+const zoneRefs = [];
+function initZones(){
   const hm = document.getElementById('hmGrid');
-  if(hm) hm.innerHTML = zones.map(z => `<div class="hm-cell"><span class="hm-name">${z.n}</span><span class="hm-pct display-font">${z.p}%</span></div>`).join('');
+  if(!hm) return;
+  hm.textContent = '';
+  zones.forEach(z => {
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    const name = document.createElement('span');
+    name.className = 'hm-name';
+    name.textContent = z.n;
+    const pct = document.createElement('span');
+    pct.className = 'hm-pct display-font';
+    cell.appendChild(name);
+    cell.appendChild(pct);
+    hm.appendChild(cell);
+    zoneRefs.push(pct);
+  });
 }
-rZones(); setInterval(()=>{ zones.forEach(z=>z.p=clamp(z.p+randStr(-6,6),10,98)); rZones();}, 2500);
+function updateZones() {
+  zones.forEach((z, i) => { zoneRefs[i].textContent = `${z.p}%`; });
+}
+initZones();
+updateZones();
+setInterval(()=>{ zones.forEach(z=>z.p=clamp(z.p+randomIntInRange(-6,6),10,98)); updateZones();}, 2500);
 
 const rrs = [{n:'NODE A',w:2,s:8},{n:'NODE B',w:5,s:3},{n:'NODE C',w:1,s:10},{n:'NODE D',w:7,s:2}];
-function rRRs(){
+const rrRefs = [];
+function initRRs(){
   const rr = document.getElementById('rrGrid');
   if(!rr) return;
-  rr.innerHTML = rrs.map(r => {
-    const pct = Math.min((r.s/12)*100,100);
-    return `<div class="rr-card"><div class="rr-header"><div class="rr-name">${r.n}</div><div class="rr-badge" style="background:var(--primary-dim);color:var(--primary)">${r.w} MIN WAIT</div></div><div class="rr-info"><span>CAPACITY</span><span>${r.s}/12</span></div><div class="rr-bar-bg"><div class="rr-bar-fill" style="width:${pct}%;"></div></div></div>`;
-  }).join('');
+  rr.textContent = '';
+  rrs.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'rr-card';
+    const header = document.createElement('div');
+    header.className = 'rr-header';
+    const name = document.createElement('div');
+    name.className = 'rr-name';
+    name.textContent = r.n;
+    const badge = document.createElement('div');
+    badge.className = 'rr-badge';
+    badge.style.background = 'var(--primary-dim)';
+    badge.style.color = 'var(--primary)';
+    header.appendChild(name);
+    header.appendChild(badge);
+
+    const info = document.createElement('div');
+    info.className = 'rr-info';
+    const capLbl = document.createElement('span');
+    capLbl.textContent = 'CAPACITY';
+    const capVal = document.createElement('span');
+    info.appendChild(capLbl);
+    info.appendChild(capVal);
+
+    const barBg = document.createElement('div');
+    barBg.className = 'rr-bar-bg';
+    const fill = document.createElement('div');
+    fill.className = 'rr-bar-fill';
+    barBg.appendChild(fill);
+
+    card.appendChild(header);
+    card.appendChild(info);
+    card.appendChild(barBg);
+    rr.appendChild(card);
+    rrRefs.push({ badge, capVal, fill });
+  });
 }
-rRRs(); setInterval(()=>{ rrs.forEach(r=>{r.w=clamp(r.w+randStr(-2,2),1,12);r.s=clamp(r.s+randStr(-2,2),1,12);}); rRRs();}, 4000);
+function updateRRs() {
+  rrs.forEach((r, i) => {
+    rrRefs[i].badge.textContent = `${r.w} MIN WAIT`;
+    rrRefs[i].capVal.textContent = `${r.s}/12`;
+    rrRefs[i].fill.style.width = `${Math.min((r.s/12)*100,100)}%`;
+  });
+}
+initRRs();
+updateRRs();
+setInterval(()=>{ rrs.forEach(r=>{r.w=clamp(r.w+randomIntInRange(-2,2),1,12);r.s=clamp(r.s+randomIntInRange(-2,2),1,12);}); updateRRs();}, 4000);
 
 const alerts = [
   {c:'primary',i:'⚠️',t:'GATE A ANOMALY',d:'Capacity overrun detected.',tm:'Just now'},
@@ -216,7 +316,7 @@ setInterval(()=> {
 }, 3000);
 
 async function callGen(msg, prompt) {
-  if (API_KEY === "hackathon") {
+  if (isDemoBypass) {
     await new Promise(r => setTimeout(r, 600));
     const m = msg.toLowerCase();
     if (m.includes("lockdown")) return "[ACTION: LOCKDOWN] Emergency lockdown protocol engaged. Perimeter sealed. Authorities notified.";
@@ -226,11 +326,12 @@ async function callGen(msg, prompt) {
     return "Directive acknowledged. Neu-Core subsystems are nominal. Proceed.";
   }
 
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+  const res = await fetch('/api/chat', {
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({system_instruction:{parts:[{text:prompt+getCtx()}]},contents:[{role:'user',parts:[{text:msg}]}],generationConfig:{temperature:0.7,maxOutputTokens:300}})
+    body:JSON.stringify({ message: msg, prompt, context: getCtx() })
   });
-  if(!res.ok) throw new Error(); return (await res.json()).candidates[0].content.parts[0].text;
+  if(!res.ok) throw new Error();
+  return (await res.json()).text;
 }
 
 function fmt(t) { return t.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--primary)">$1</strong>').replace(/\n/g,'<br>'); }

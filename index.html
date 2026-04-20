@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="style.css">
   
   <!-- EXTERNAL JS -->
+  <script src="utils.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -31,38 +32,39 @@
   <div id="toastWrap"></div>
 
   <!-- HEADER -->
-  <header class="founderz-header">
-    <div class="fh-left">
-      <div class="fh-nav active" data-tab="overview">Overview</div>
-      <div class="fh-nav" data-tab="chat">Neu-Chat</div>
-      <div class="fh-nav" data-tab="map">Spatial</div>
+  <header class="founderz-header" role="banner">
+    <div class="fh-left" role="navigation" aria-label="Primary navigation">
+      <div class="fh-nav active" data-tab="overview" role="button" tabindex="0" aria-label="Open overview tab">Overview</div>
+      <div class="fh-nav" data-tab="chat" role="button" tabindex="0" aria-label="Open neu-chat tab">Neu-Chat</div>
+      <div class="fh-nav" data-tab="map" role="button" tabindex="0" aria-label="Open spatial tab">Spatial</div>
     </div>
     <div class="fh-center display-font"><div class="icon"></div>VENUEIQ</div>
-    <div class="fh-right">
-      <div class="fh-nav" data-tab="staff" style="margin-right:8px;">Ops</div>
-      <div class="fh-nav" data-tab="lab" style="margin-right:16px;">Agent Code</div>
+    <div class="fh-right" role="navigation" aria-label="Secondary navigation">
+      <div class="fh-nav" data-tab="staff" role="button" tabindex="0" aria-label="Open operations tab" style="margin-right:8px;">Ops</div>
+      <div class="fh-nav" data-tab="lab" role="button" tabindex="0" aria-label="Open agent code tab" style="margin-right:16px;">Agent Code</div>
       <div class="fh-game-meta">Q3 <span id="clockHead" class="fh-meta-clock">LIVE</span></div>
-      <button class="fh-btn-outline" id="skipHeaderBtn">Demo Mode</button>
-      <button class="fh-btn-solid" id="connectHeaderBtn">Init Core</button>
+      <button class="fh-btn-outline" id="skipHeaderBtn" aria-label="Open demo mode">Demo Mode</button>
+      <button class="fh-btn-solid" id="connectHeaderBtn" aria-label="Initialize core connection">Init Core</button>
     </div>
   </header>
 
   <!-- AUTH MODAL -->
-  <div class="modal-overlay" id="apiModal" class="hidden">
-    <div class="modal-content">
-      <div class="modal-title display-font">Authenticate</div>
+  <div class="modal-overlay hidden" id="apiModal" role="dialog" aria-modal="true" aria-labelledby="apiModalTitle">
+    <div class="modal-content" role="document">
+      <div class="modal-title display-font" id="apiModalTitle">Authenticate</div>
       <div class="modal-desc">Connect Gemini 2.0 to activate Agentic System.</div>
       <div id="apiError" style="color:var(--red); font-size:0.85rem; margin-bottom:16px; display:none;">Error: Invalid Auth Token</div>
-      <input type="password" id="apiKeyInput" class="modal-input" placeholder="Enter API Key" autocomplete="off">
-      <button id="connectBtn" class="modal-btn">Initialize Connection</button>
-      <button id="skipBtn" class="modal-btn-skip">Skip & Run Demo Data</button>
+      <label for="apiKeyInput" class="sr-only">API key</label>
+      <input type="password" id="apiKeyInput" class="modal-input" placeholder="Enter API Key" autocomplete="off" aria-label="API key input">
+      <button id="connectBtn" class="modal-btn" aria-label="Validate and initialize connection">Initialize Connection</button>
+      <button id="skipBtn" class="modal-btn-skip" aria-label="Skip authentication and use demo data">Skip & Run Demo Data</button>
     </div>
   </div>
 
   <!-- MAIN APP WRAPPER -->
   <div class="app-layout">
     <div class="main-wrapper">
-      <main class="main-content" id="mainContent">
+      <main class="main-content" id="mainContent" role="main">
         
         <!-- OVERVIEW TAB -->
         <section class="tab-pane active" id="pane-overview">
@@ -85,7 +87,7 @@
           <div class="card-box" style="padding-bottom: 24px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                <div class="section-title" style="margin:0;">24H CROWD DENSITY TREND</div>
-               <button class="fh-btn-outline" style="font-size:0.7rem; padding: 6px 14px;" onclick="fireAgentAction('REPORT')">↓ EXPORT PDF</button>
+               <button class="fh-btn-outline" style="font-size:0.7rem; padding: 6px 14px;" onclick="fireAgentAction('REPORT')" aria-label="Export PDF report">↓ EXPORT PDF</button>
             </div>
             <div class="chart-container-wrap">
               <canvas id="trendChart"></canvas>
@@ -101,7 +103,7 @@
         <!-- CHAT TAB -->
         <section class="tab-pane" id="pane-chat">
           <div class="chat-wrapper">
-            <div class="chat-history" id="chatArea">
+            <div class="chat-history" id="chatArea" role="log" aria-live="polite" aria-label="Neu-chat history">
               <div class="bubble ai" style="opacity:1;">
                 <div class="ai-header">
                   <div class="ai-name"><div class="icon"></div> VIQ AGENT</div>
@@ -112,14 +114,15 @@
             </div>
             <div class="chat-input-area">
               <div class="quick-pills" id="pillsWrap">
-                <button class="pill-btn">Deploy staff to Gate A</button>
-                <button class="pill-btn" style="color:var(--red); border-color:var(--red);">Initiate emergency lockdown</button>
-                <button class="pill-btn">Locate Restroom</button>
-                <button class="pill-btn">Export daily report</button>
+                <button class="pill-btn" aria-label="Deploy staff to Gate A">Deploy staff to Gate A</button>
+                <button class="pill-btn" style="color:var(--red); border-color:var(--red);" aria-label="Initiate emergency lockdown">Initiate emergency lockdown</button>
+                <button class="pill-btn" aria-label="Locate restroom">Locate Restroom</button>
+                <button class="pill-btn" aria-label="Export daily report">Export daily report</button>
               </div>
               <div class="input-box">
-                <input type="text" id="chatInp" class="input-field" placeholder="Command Agentic UI..." autocomplete="off">
-                <button id="sendBtn" class="send-action">↑</button>
+                <label for="chatInp" class="sr-only">Chat input</label>
+                <input type="text" id="chatInp" class="input-field" placeholder="Command Agentic UI..." autocomplete="off" aria-label="Chat input">
+                <button id="sendBtn" class="send-action" aria-label="Send chat message">↑</button>
               </div>
             </div>
           </div>
@@ -139,7 +142,7 @@
         <section class="tab-pane" id="pane-staff">
           <div class="card-box">
             <div class="section-title">PRECOGNITIVE ANALYSIS</div>
-            <button class="action-btn" id="genPredsBtn">RUN ML PREDICTION <span style="font-weight:900;">→</span></button>
+            <button class="action-btn" id="genPredsBtn" aria-label="Run machine learning prediction">RUN ML PREDICTION <span style="font-weight:900;">→</span></button>
             <div id="predsList"></div>
           </div>
           <div class="card-box">
@@ -163,15 +166,15 @@
           </div>
           <div class="terminal-card" style="background:#fff;">
             <div class="section-title" style="color:var(--text);">MANUAL FUNCTION OVERRIDE</div>
-            <button class="action-btn" onclick="fireAgentAction('DISPATCH')">SIMULATE: DISPATCH UI</button>
-            <button class="action-btn" style="background:var(--red);margin:0;" onclick="fireAgentAction('LOCKDOWN')">SIMULATE: LOCKDOWN UI</button>
+            <button class="action-btn" onclick="fireAgentAction('DISPATCH')" aria-label="Simulate dispatch UI action">SIMULATE: DISPATCH UI</button>
+            <button class="action-btn" style="background:var(--red);margin:0;" onclick="fireAgentAction('LOCKDOWN')" aria-label="Simulate lockdown UI action">SIMULATE: LOCKDOWN UI</button>
           </div>
         </section>
 
       </main>
 
       <!-- RIGHT PANEL ALERTS -->
-      <aside class="right-panel">
+      <aside class="right-panel" role="complementary" aria-label="Quick controls and anomaly alerts">
         <div class="panel-section" style="padding-bottom:12px;">
           <div class="section-title">REAL-TIME ANOMALIES</div>
           <div class="alerts-list" id="rAlerts"></div>
@@ -182,8 +185,9 @@
             <div class="qc-bubble qc-ai">Subsystems active.</div>
           </div>
           <div class="qc-input-wrap">
-            <input type="text" class="qc-input" id="qcInp" placeholder="Ping Agent..." autocomplete="off">
-            <button class="qc-send" id="qcBtn">↑</button>
+             <label for="qcInp" class="sr-only">Quick chat input</label>
+             <input type="text" class="qc-input" id="qcInp" placeholder="Ping Agent..." autocomplete="off" aria-label="Quick chat input">
+             <button class="qc-send" id="qcBtn" aria-label="Send quick chat message">↑</button>
           </div>
           <div class="qc-brand" style="margin-top:16px;">Agentic UI Powered by Gemini</div>
         </div>
@@ -192,12 +196,12 @@
     </div>
 
     <!-- MOBILE NAVIGATION -->
-    <nav class="mobile-tab-bar">
-      <div class="mob-tab active" data-tab="overview">Home</div>
-      <div class="mob-tab" data-tab="chat">Agent</div>
-      <div class="mob-tab" data-tab="map">Map</div>
-      <div class="mob-tab" data-tab="staff">Ops</div>
-      <div class="mob-tab" data-tab="lab">Code</div>
+    <nav class="mobile-tab-bar" role="navigation" aria-label="Mobile navigation">
+      <div class="mob-tab active" data-tab="overview" role="button" tabindex="0" aria-label="Open home tab">Home</div>
+      <div class="mob-tab" data-tab="chat" role="button" tabindex="0" aria-label="Open agent tab">Agent</div>
+      <div class="mob-tab" data-tab="map" role="button" tabindex="0" aria-label="Open map tab">Map</div>
+      <div class="mob-tab" data-tab="staff" role="button" tabindex="0" aria-label="Open operations tab">Ops</div>
+      <div class="mob-tab" data-tab="lab" role="button" tabindex="0" aria-label="Open code tab">Code</div>
     </nav>
   </div>
 
