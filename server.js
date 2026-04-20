@@ -1,13 +1,20 @@
 require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
-const { clamp } = require('./utils');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '1mb' }));
-app.use(express.static(__dirname));
+
+const rootDir = __dirname;
+const sendRootFile = (res, filename) => res.sendFile(path.join(rootDir, filename));
+
+app.get('/', (_req, res) => sendRootFile(res, 'index.html'));
+app.get('/app.js', (_req, res) => sendRootFile(res, 'app.js'));
+app.get('/style.css', (_req, res) => sendRootFile(res, 'style.css'));
+app.get('/utils.js', (_req, res) => sendRootFile(res, 'utils.js'));
 
 app.post('/api/chat', async (req, res) => {
   try {
@@ -32,7 +39,7 @@ app.post('/api/chat', async (req, res) => {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: prompt + context }] },
           contents: [{ role: 'user', parts: [{ text: message }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: clamp(300, 1, 2048) }
+          generationConfig: { temperature: 0.7, maxOutputTokens: 300 }
         })
       }
     );
