@@ -71,7 +71,7 @@ document.getElementById('skipHeaderBtn').onclick = openModal;
 document.getElementById('connectHeaderBtn').onclick = openModal;
 
 document.getElementById('connectBtn').onclick = async () => {
-  const key = document.getElementById('apiKeyInput').value.trim().toLowerCase();
+  const key = document.getElementById('apiKeyInput').value.trim();
   const errEl = document.getElementById('apiError');
   errEl.style.display = 'none';
   const btn = document.getElementById('connectBtn');

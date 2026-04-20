@@ -57,6 +57,7 @@ app.post('/api/chat', async (req, res) => {
 
     return res.json({ text });
   } catch (error) {
+    console.error('Error handling /api/chat:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
